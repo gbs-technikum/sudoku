@@ -3,30 +3,26 @@ package sudoku;
 public class Sudoku {
     
     public static final Integer LENGTH = 9;
-    private Integer[][] numbers;
+    private Number[][] numbers;
     
     public Sudoku(){        
         init();
     }
     
     private void init(){
-        numbers = new Integer[LENGTH][LENGTH];
+        numbers = new Number[LENGTH][LENGTH];
         for(int l=0;l<LENGTH;l++){
             for(int c=0;c<LENGTH;c++){
-                numbers[l][c] = 0;
+                numbers[l][c] = new Number();
             }
         }
     }
     
-    public Integer getNumber(int line, int column){
+    public Number getNumber(int line, int column){
         return numbers[line][column];
     }
-    
-    public void setNumber(int line, int column, int value){
-        numbers[line][column] = value;
-    }
 
-    public Integer[][] getNumbers() {
+    public Number[][] getNumbers() {
         return numbers;
     }
     

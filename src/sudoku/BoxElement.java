@@ -16,6 +16,7 @@ public class BoxElement extends JPanel{
     private final SudokuController controller;
     private final int line;
     private final int column;
+    private Font blackFont;
     
     public BoxElement(SudokuController controller, int line, int column){
         this.controller = controller;
@@ -25,9 +26,11 @@ public class BoxElement extends JPanel{
     }
     
     private void init(){
-        setBorder(BorderFactory.createLineBorder(Color.black));
+        setBorder(BorderFactory.createMatteBorder(1,1,1,1,Color.black));        
         label = new JLabel();
-        label.setFont(new Font("Courier", Font.BOLD,26));
+        blackFont = new Font("Courier", Font.BOLD,26);
+        label.setFont(blackFont);
+        
         label.setHorizontalAlignment(SwingConstants.CENTER);
         label.setVerticalAlignment(SwingConstants.CENTER);
         addMouseListener(new MouseAdapter() {
@@ -45,8 +48,8 @@ public class BoxElement extends JPanel{
         add(label);
     }
     
-    private void setNumber(){
-        Integer number = controller.getNumber(line, column);
+    public void setNumber(){
+        Integer number = controller.getNumber(line, column).getValue();
         if(number!=0){
             label.setText(number+"");
         } else{
@@ -56,5 +59,9 @@ public class BoxElement extends JPanel{
 
     public JLabel getLabel() {
         return label;
+    }
+
+    void setRed() {
+        label.setForeground(Color.RED);
     }
 }

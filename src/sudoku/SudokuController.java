@@ -14,16 +14,15 @@ public class SudokuController {
         SudokuController.sudoku = sudoku;
         line = 0;
         column = 0;
-        value = 7;
-        findSolution();
+        value = 1;
         System.out.println(checkAll());
     }
     
     private boolean checkLine(int line){
-        Integer numbers[][] = sudoku.getNumbers();
+        Number numbers[][] = sudoku.getNumbers();
         for(int counter1=0;counter1<LENGTH;counter1++){
             for(int counter2=counter1+1;counter2<LENGTH;counter2++){
-                if(numbers[line][counter1] != 0 && Objects.equals(numbers[line][counter2], numbers[line][counter1])){
+                if(numbers[line][counter1].getValue() != 0 && Objects.equals(numbers[line][counter2].getValue(), numbers[line][counter1].getValue())){
                     return false;
                 }
             }
@@ -32,10 +31,10 @@ public class SudokuController {
     }
     
     private boolean checkColumn(int column){
-        Integer numbers[][] = sudoku.getNumbers();
+        Number numbers[][] = sudoku.getNumbers();
         for(int counter1=0;counter1<LENGTH;counter1++){
             for(int counter2=counter1+1;counter2<LENGTH;counter2++){
-                if(numbers[counter1][column] != 0 && Objects.equals(numbers[counter2][column], numbers[counter1][column])){
+                if(numbers[counter1][column].getValue() != 0 && Objects.equals(numbers[counter2][column].getValue(), numbers[counter1][column].getValue())){
                     return false;
                 }
             }
@@ -44,18 +43,18 @@ public class SudokuController {
     }
     
     private boolean checkBox(int box){
-        Integer numbers[][] = sudoku.getNumbers();
+        Number numbers[][] = sudoku.getNumbers();
         Integer boxNumbers[] = new Integer[LENGTH];
         
-        boxNumbers[0] = numbers[(box/3)*3+0][(box%3)*3+0];
-        boxNumbers[1] = numbers[(box/3)*3+0][(box%3)*3+1];
-        boxNumbers[2] = numbers[(box/3)*3+0][(box%3)*3+2];
-        boxNumbers[3] = numbers[(box/3)*3+1][(box%3)*3+0];
-        boxNumbers[4] = numbers[(box/3)*3+1][(box%3)*3+1];
-        boxNumbers[5] = numbers[(box/3)*3+1][(box%3)*3+2];
-        boxNumbers[6] = numbers[(box/3)*3+2][(box%3)*3+0];
-        boxNumbers[7] = numbers[(box/3)*3+2][(box%3)*3+1];
-        boxNumbers[8] = numbers[(box/3)*3+2][(box%3)*3+2];
+        boxNumbers[0] = numbers[(box/3)*3+0][(box%3)*3+0].getValue();
+        boxNumbers[1] = numbers[(box/3)*3+0][(box%3)*3+1].getValue();
+        boxNumbers[2] = numbers[(box/3)*3+0][(box%3)*3+2].getValue();
+        boxNumbers[3] = numbers[(box/3)*3+1][(box%3)*3+0].getValue();
+        boxNumbers[4] = numbers[(box/3)*3+1][(box%3)*3+1].getValue();
+        boxNumbers[5] = numbers[(box/3)*3+1][(box%3)*3+2].getValue();
+        boxNumbers[6] = numbers[(box/3)*3+2][(box%3)*3+0].getValue();
+        boxNumbers[7] = numbers[(box/3)*3+2][(box%3)*3+1].getValue();
+        boxNumbers[8] = numbers[(box/3)*3+2][(box%3)*3+2].getValue();
         
         for(int counter1=0;counter1<LENGTH;counter1++){
             for(int counter2=counter1+1;counter2<LENGTH;counter2++){
@@ -70,7 +69,7 @@ public class SudokuController {
     private boolean isZero(){
         for(int l=0;l<LENGTH;l++){
             for(int c=0;c<LENGTH;c++){
-                if(sudoku.getNumber(l, c)==0){
+                if(sudoku.getNumber(l, c).getValue()==0){
                     return true;
                 }
             }
@@ -91,28 +90,28 @@ public class SudokuController {
     }
     
     public void increaseNumber(int line, int column){
-        Integer number = sudoku.getNumber(line, column)+1;
+        Integer number = sudoku.getNumber(line, column).getValue()+1;
         if(number==10)
-            sudoku.setNumber(line,column,0);
+            sudoku.getNumber(line,column).setValue(0);
         else
-            sudoku.setNumber(line,column,number);
+            sudoku.getNumber(line,column).setValue(number);
     }
     
     public void decreaseNumber(int line, int column){
-        Integer number = sudoku.getNumber(line, column)-1;
+        Integer number = sudoku.getNumber(line, column).getValue()-1;
         System.out.println(number);
         if(number==-1)
-            sudoku.setNumber(line,column,9);
+            sudoku.getNumber(line,column).setValue(9);
         else
-            sudoku.setNumber(line,column,number);
+            sudoku.getNumber(line,column).setValue(number);
     }
     
-    public Integer getNumber(int line, int column){
+    public Number getNumber(int line, int column){
         return sudoku.getNumber(line, column);
     }
 
-    private void findSolution() {
-        sudoku.setNumber(line, column, value);
+    public void findSolution() {
+        sudoku.getNumber(line,column).setValue(value);
         if(checkAll()){
             
             if(isFinished()){
@@ -124,13 +123,19 @@ public class SudokuController {
         } else{
             value++;
             if(value==10){
-                sudoku.setNumber(line, column, 0);
+                sudoku.getNumber(line,column).setValue(0);
                 stepBackwards();
                 findSolution();
             } else{
                 findSolution();
             }
         }
+    }
+
+    public void initFindingSolution() {
+        line=0;
+        column=-1;
+        stepForeward();
     }
     
     private void stepForeward(){
@@ -140,6 +145,8 @@ public class SudokuController {
             line++;
         }
         value = 1;
+        if(!sudoku.getNumber(line,column).isEditable())
+            stepForeward();
     }
     
     private void stepBackwards(){
@@ -148,9 +155,20 @@ public class SudokuController {
             column=LENGTH-1;
             line--;
         }
-        value = sudoku.getNumber(line, column)+1;
+        if(!sudoku.getNumber(line,column).isEditable())
+            stepBackwards();
+        value = sudoku.getNumber(line,column).getValue()+1;
         if(value==10){
             stepBackwards();
+        }
+    }
+    
+    public void lockNumbersWithValues(){
+        for(int l=0;l<LENGTH;l++){
+            for(int c=0;c<LENGTH;c++){
+                if(sudoku.getNumber(l,c).getValue()!=0)
+                    sudoku.getNumber(l,c).setEditable(false);
+            }
         }
     }
 }
